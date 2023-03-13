@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG)
 logging.info("Started the run.")
 
 # Define the CLI defaults:
-defaults = {'verbosity': 'debug', 'threads': 2, 'kraken': 'kraken2'}
+defaults = {'verbosity': 'debug', 'threads': 2, 'kraken': 'kraken2','confidence':0.05,'minimum-hit-groups':4}
 
 # Create the command line interface:
 parser = argparse.ArgumentParser(description='Assign metagenomic assignment to single cells')
@@ -26,6 +26,9 @@ parser.add_argument('-v', '--verbose', dest = 'verbosity', default = defaults['v
 parser.add_argument('-n', '--threads', dest = 'threads', default = defaults['threads'], help = "n cores")
 parser.add_argument('-k', '--kraken', dest = 'kraken', default = defaults['kraken'], help = "path to kraken2 executable, if not in $PATH")
 parser.add_argument('-prefix', '--prefix', dest = 'prefix', help = "Prefix file output filenames")
+parser.add_argument('-confidence', '--confidence', dest = 'confidence',default=defaults['confidence'], help = "Confidence")
+parser.add_argument('-minimum-hit-groups', '--minimum-hit-groups', dest = 'hitgroups',default=defaults['minimum-hit-groups'], help = "Minimum hit groups")
+
 
 # Parse the CLI:
 args = parser.parse_args()
@@ -74,7 +77,7 @@ logging.info("FASTQ generated and saved to {}".format(fqfile))
 ############# Run metagenomic tool on fastq and report summary #############
 # run kraken
 # kraken2 --threads 2 --db dbpath --report reportfilepath inputfastqpath > krakenoutputfilepath
-cmd3 = args.kraken + " --threads " + args.threads + " --db " + args.dbfile + " --report " + reportf + " " + fqfile + " > " + krakenoutfile
+cmd3 = args.kraken + " --threads " + args.threads + " --confidence" + args.confidence + " --minimum-hit-groups" + args.hitgroups + " --db " + args.dbfile + " --report " + reportf + " " + fqfile + " > " + krakenoutfile
 proc3 = subprocess.Popen(cmd3, shell=True)
 proc3.wait()
 logging.info("Kraken2 finished running, krakenoutput saved to {}".format(krakenoutfile))
