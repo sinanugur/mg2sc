@@ -77,7 +77,7 @@ logging.info("FASTQ generated and saved to {}".format(fqfile))
 ############# Run metagenomic tool on fastq and report summary #############
 # run kraken
 # kraken2 --threads 2 --db dbpath --report reportfilepath inputfastqpath > krakenoutputfilepath
-cmd3 = args.kraken + " --threads " + args.threads + " --confidence" + str(args.confidence) + " --minimum-hit-groups" + str(args.hitgroups) + " --db " + args.dbfile + " --report " + reportf + " " + fqfile + " > " + krakenoutfile
+cmd3 = args.kraken + " --threads " + args.threads + " --confidence " + str(args.confidence) + " --minimum-hit-groups " + str(args.hitgroups) + " --db " + args.dbfile + " --report " + reportf + " " + fqfile + " > " + krakenoutfile
 proc3 = subprocess.Popen(cmd3, shell=True)
 proc3.wait()
 logging.info("Kraken2 finished running, krakenoutput saved to {}".format(krakenoutfile))
