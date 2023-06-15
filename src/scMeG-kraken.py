@@ -28,6 +28,7 @@ parser.add_argument('-k', '--kraken', dest = 'kraken', default = defaults['krake
 parser.add_argument('-prefix', '--prefix', dest = 'prefix', help = "Prefix file output filenames")
 parser.add_argument('-confidence', '--confidence', dest = 'confidence',default=defaults['confidence'], help = "Confidence")
 parser.add_argument('-minimum-hit-groups', '--minimum-hit-groups', dest = 'hitgroups',default=defaults['minimum-hit-groups'], help = "Minimum hit groups")
+#parser.add_argument('-classified-out', '--classified-out', dest = 'classified', help = "Classified file name")
 
 
 # Parse the CLI:
@@ -48,6 +49,7 @@ bamfile_out = os.path.join(args.outdir,prefix + "_unmapped.bam")
 fqfile = os.path.join(args.outdir,prefix + "_unmapped.fq")
 krakenoutfile = os.path.join(args.outdir,prefix + "_output.kraken")
 reportf = os.path.join(args.outdir,prefix + "_krakenreport.txt")
+classout = os.path.join(args.outdir,prefix + "_classified_sequences.txt")
 
 # Make output directories and check that all files exist
 if not os.path.exists(args.outdir):
@@ -77,7 +79,7 @@ logging.info("FASTQ generated and saved to {}".format(fqfile))
 ############# Run metagenomic tool on fastq and report summary #############
 # run kraken
 # kraken2 --threads 2 --db dbpath --report reportfilepath inputfastqpath > krakenoutputfilepath
-cmd3 = args.kraken + " --threads " + args.threads + " --confidence " + str(args.confidence) + " --minimum-hit-groups " + str(args.hitgroups) + " --db " + args.dbfile + " --report " + reportf + " " + fqfile + " > " + krakenoutfile
+cmd3 = args.kraken + " --threads " + args.threads + " --confidence " + str(args.confidence) + " --classified-out " + classout + " --minimum-hit-groups " + str(args.hitgroups) + " --db " + args.dbfile + " --report " + reportf + " " + fqfile + " > " + krakenoutfile
 proc3 = subprocess.Popen(cmd3, shell=True)
 proc3.wait()
 logging.info("Kraken2 finished running, krakenoutput saved to {}".format(krakenoutfile))
