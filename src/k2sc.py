@@ -76,7 +76,7 @@ def extract_ids(bamfile, krakenfile):
         # Check that read names in kraken and bam file match
         if sread.query_name != kread.split('\t')[1]:
             skipped += 1
-            #logging.warning("sam file read name and metagenomicsfile read name don't match and are therefore excluded: sam: {}, kraken: {}".format(sread.query_name, kread.split('\t')[1])) #fastp causes problem
+            logging.warning("sam file read name and metagenomicsfile read name don't match and are therefore excluded: sam: {}, kraken: {}".format(sread.query_name, kread.split('\t')[1])) #due to fastp, warning
             continue
 
         # Get cell barcode and UMI from bam file

@@ -72,12 +72,15 @@ logging.info("Unmapped reads were extracted and saved to {}".format(bamfile_out)
 # Convert to fastq
 # bedtools bamtofastq -i output_unmapped.bam -fq output_unmapped.fq
 #cmd2 = "samtools fastq -@ " + args.threads + " -n " + bamfile_out + " > " + fqfile
+
 cmd2 = "samtools fastq -@ " + args.threads + " -n " + bamfile_out + " | fastp --stdin --stdout -Q -L -A -y " + " > " + fqfile #add fastp low complexity filtering
 
 
 proc2 = subprocess.Popen(cmd2, shell=True)
 proc2.wait()
 logging.info("FASTQ generated and saved to {}".format(fqfile))
+
+
 
 ############# Run metagenomic tool on fastq and report summary #############
 # run kraken
@@ -87,7 +90,16 @@ proc3 = subprocess.Popen(cmd3, shell=True)
 proc3.wait()
 logging.info("Kraken2 finished running, krakenoutput saved to {}".format(krakenoutfile))
 
+cmd4= "cat " + fqfile +  " | grep ^@ | tr -d ^@ > " + fqfile + ".id"
+proc4 = subprocess.Popen(cmd4, shell=True)
+proc4.wait()
+
+cmd5 = "samtools view -@ " + args.threads + bamfile_out + "  | fgrep -w -f " + fqfile + ".id | samtools view -b > " + bamfile_out + ".tmp"
+
+proc5 = subprocess.Popen(cmd5, shell=True)
+proc5.wait()
+
 # Split output into single cell level and report sparse matrix (mg2sc.py)
-mg2sc(bamfile_out, krakenoutfile, args.dbfile, args.outdir)
+mg2sc(bamfile_out + ".tmp", krakenoutfile, args.dbfile, args.outdir)
 logging.info("Sparse matrix with single cell information created")
 logging.info("Run finished.")
