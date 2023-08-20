@@ -65,8 +65,11 @@ logging.info("Threads used: {}".format(args.threads))
 # Extract unmapped reads from bam
 # samtools view -b -f 4 starsoloinput.bam > output_unmapped.bam
 cmd1 = "samtools view -@ " + args.threads + " -b -f 4 " + args.bamfile + " > " + bamfile_out
+cmd11 = "samtools view -H " + bamfile_out  + " > " + bamfile_out + ".header"
 proc1 = subprocess.Popen(cmd1, shell=True)
 proc1.wait()
+proc11 = subprocess.Popen(cmd11, shell=True)
+proc11.wait()
 logging.info("Unmapped reads were extracted and saved to {}".format(bamfile_out))
 
 # Convert to fastq
@@ -94,10 +97,14 @@ cmd4= "cat " + fqfile +  " | grep ^@ | tr -d ^@ > " + fqfile + ".id"
 proc4 = subprocess.Popen(cmd4, shell=True)
 proc4.wait()
 
-cmd5 = "samtools view -@ " + args.threads + bamfile_out + "  | fgrep -w -f " + fqfile + ".id | samtools view -b > " + bamfile_out + ".tmp"
+
+cmd5 = "samtools view -@ " + args.threads + " " + bamfile_out + "  | fgrep -w -f " + fqfile + ".id | " + "awk 'NR==FNR { l[$1]=$0; next } $1 in l {print l[$1]}' - " + fqfile + ".id | samtools view -bS | samtools reheader " + bamfile_out + ".header" +  " - > " + bamfile_out + ".tmp"
 
 proc5 = subprocess.Popen(cmd5, shell=True)
 proc5.wait()
+
+
+
 
 # Split output into single cell level and report sparse matrix (mg2sc.py)
 mg2sc(bamfile_out + ".tmp", krakenoutfile, args.dbfile, args.outdir)
