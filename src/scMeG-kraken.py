@@ -76,7 +76,7 @@ logging.info("Unmapped reads were extracted and saved to {}".format(bamfile_out)
 # bedtools bamtofastq -i output_unmapped.bam -fq output_unmapped.fq
 #cmd2 = "samtools fastq -@ " + args.threads + " -n " + bamfile_out + " > " + fqfile
 
-cmd2 = "samtools fastq -@ " + args.threads + " -n " + bamfile_out + " | fastp --stdin --stdout --complexity_threshold 20 -Q -L -A -y " + " > " + fqfile #add fastp low complexity filtering
+cmd2 = "samtools fastq -@ " + args.threads + " -n " + bamfile_out + " | fastp --stdin --stdout --complexity_threshold 30 -Q -L -A -y " + " > " + fqfile #add fastp low complexity filtering
 
 
 proc2 = subprocess.Popen(cmd2, shell=True)
