@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG)
 logging.info("Started the run.")
 
 # Define the CLI defaults:
-defaults = {'verbosity': 'debug', 'threads': 2, 'kraken': 'kraken2','confidence':0.05,'minimum-hit-groups':4}
+defaults = {'verbosity': 'debug', 'threads': 2, 'kraken': 'kraken2','confidence':0.05,'minimum-hit-groups':4,'complexity':0}
 
 # Create the command line interface:
 parser = argparse.ArgumentParser(description='Assign metagenomic assignment to single cells')
@@ -28,6 +28,7 @@ parser.add_argument('-k', '--kraken', dest = 'kraken', default = defaults['krake
 parser.add_argument('-prefix', '--prefix', dest = 'prefix', help = "Prefix file output filenames")
 parser.add_argument('-confidence', '--confidence', dest = 'confidence',default=defaults['confidence'], help = "Confidence")
 parser.add_argument('-minimum-hit-groups', '--minimum-hit-groups', dest = 'hitgroups',default=defaults['minimum-hit-groups'], help = "Minimum hit groups")
+parser.add_argument('-complexity', '--complexity', dest = 'complexity',default=defaults['complexity'], help = "Complexity treshold for fastp")
 #parser.add_argument('-classified-out', '--classified-out', dest = 'classified', help = "Classified file name")
 
 
@@ -76,7 +77,7 @@ logging.info("Unmapped reads were extracted and saved to {}".format(bamfile_out)
 # bedtools bamtofastq -i output_unmapped.bam -fq output_unmapped.fq
 #cmd2 = "samtools fastq -@ " + args.threads + " -n " + bamfile_out + " > " + fqfile
 
-cmd2 = "samtools fastq -@ " + args.threads + " -n " + bamfile_out + " | fastp --stdin --stdout --complexity_threshold 10 -Q -L -A -y " + " > " + fqfile #add fastp low complexity filtering
+cmd2 = "samtools fastq -@ " + args.threads + " -n " + bamfile_out + " | fastp --stdin --stdout --complexity_threshold " + args.complexity + " -Q -L -A -y " + " > " + fqfile #add fastp low complexity filtering
 
 
 proc2 = subprocess.Popen(cmd2, shell=True)
