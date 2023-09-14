@@ -29,6 +29,7 @@ parser.add_argument('-prefix', '--prefix', dest = 'prefix', help = "Prefix file 
 parser.add_argument('-confidence', '--confidence', dest = 'confidence',default=defaults['confidence'], help = "Confidence")
 parser.add_argument('-minimum-hit-groups', '--minimum-hit-groups', dest = 'hitgroups',default=defaults['minimum-hit-groups'], help = "Minimum hit groups")
 parser.add_argument('-complexity', '--complexity', dest = 'complexity',default=defaults['complexity'], help = "Complexity treshold for fastp")
+parser.add_argument('-bdb', '--bowtie', dest = 'bowtie', help = "path to a bowtie2 db file to filter out host reads")
 #parser.add_argument('-classified-out', '--classified-out', dest = 'classified', help = "Classified file name")
 
 
@@ -94,9 +95,20 @@ proc3 = subprocess.Popen(cmd3, shell=True)
 proc3.wait()
 logging.info("Kraken2 finished running, krakenoutput saved to {}".format(krakenoutfile))
 
-cmd4= "cat " + fqfile +  " | grep ^@ | tr -d ^@ > " + fqfile + ".id"
+cmd4= "cat " + fqfile +  " | grep ^@ | tr -d ^@ |  > " + fqfile + ".id"
 proc4 = subprocess.Popen(cmd4, shell=True)
 proc4.wait()
+
+
+if args.bowtie is not None:
+    
+    ppp=subprocess.Popen("bowtie2 --no-unal --very-fast -x " + args.bowtie +  " -p " + args.threads + " -b  " + bamfile_out + " | cut -f1 | grep -v ^@ > " + fqfile + ".exclude", shell=True)
+    ppp.wait()
+    ppp=subprocess.Popen("bowtie2 --no-unal --align-paired-reads --very-fast -x " + args.bowtie +  " -p " + args.threads + " -b  " + bamfile_out + " | cut -f1 | grep -v ^@ >> " + fqfile + ".exclude", shell=True)
+    ppp.wait()
+    ppp=subprocess.Popen("cat " + fqfile + ".id | grep -F -w -v -f " + fqfile + ".exclude | sponge " + fqfile + ".id" , shell=True)
+    ppp.wait()
+
 
 
 cmd5 = "samtools view -@ " + args.threads + " " + bamfile_out + "  | fgrep -w -f " + fqfile + ".id | " + "awk 'NR==FNR { l[$1]=$0; next } $1 in l {print l[$1]}' - " + fqfile + ".id | samtools view -bS | samtools reheader " + bamfile_out + ".header" +  " - > " + bamfile_out + ".tmp"
