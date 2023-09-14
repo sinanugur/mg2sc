@@ -117,9 +117,13 @@ proc5 = subprocess.Popen(cmd5, shell=True)
 proc5.wait()
 
 
+cmd6 = "cat " + krakenoutfile + "  | fgrep -w -f " + fqfile + ".id | " + "awk 'NR==FNR { l[$1]=$0; next } $1 in l {print l[$1]}' - " + fqfile + ".id | sponge " + krakenoutfile + ".tmp"
+
+proc6 = subprocess.Popen(cmd6, shell=True)
+proc6.wait()
 
 
 # Split output into single cell level and report sparse matrix (mg2sc.py)
-mg2sc(bamfile_out + ".tmp", krakenoutfile, args.dbfile, args.outdir)
+mg2sc(bamfile_out + ".tmp", krakenoutfile + ".tmp", args.dbfile, args.outdir)
 logging.info("Sparse matrix with single cell information created")
 logging.info("Run finished.")
