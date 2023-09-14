@@ -95,7 +95,7 @@ proc3 = subprocess.Popen(cmd3, shell=True)
 proc3.wait()
 logging.info("Kraken2 finished running, krakenoutput saved to {}".format(krakenoutfile))
 
-cmd4= "cat " + fqfile +  " | grep ^@ | tr -d ^@ |  > " + fqfile + ".id"
+cmd4= "cat " + fqfile +  " | grep ^@ | tr -d ^@  > " + fqfile + ".id"
 proc4 = subprocess.Popen(cmd4, shell=True)
 proc4.wait()
 
