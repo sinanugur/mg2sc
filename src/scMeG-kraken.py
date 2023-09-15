@@ -117,7 +117,7 @@ proc5 = subprocess.Popen(cmd5, shell=True)
 proc5.wait()
 
 
-cmd6 = "cat " + krakenoutfile + "  | fgrep -w -f " + fqfile + ".id | " + "awk 'NR==FNR { l[$1]=$0; next } $1 in l {print l[$1]}' - " + fqfile + ".id | sponge " + krakenoutfile + ".tmp"
+cmd6 = "cat " + krakenoutfile + "  | fgrep -w -f " + fqfile + ".id | " + "awk 'NR==FNR { l[$2]=$0; next } $1 in l {print l[$1]}' - " + fqfile + ".id | sponge " + krakenoutfile + ".tmp"
 
 proc6 = subprocess.Popen(cmd6, shell=True)
 proc6.wait()
