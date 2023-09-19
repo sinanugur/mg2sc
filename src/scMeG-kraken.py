@@ -30,6 +30,7 @@ parser.add_argument('-confidence', '--confidence', dest = 'confidence',default=d
 parser.add_argument('-minimum-hit-groups', '--minimum-hit-groups', dest = 'hitgroups',default=defaults['minimum-hit-groups'], help = "Minimum hit groups")
 parser.add_argument('-complexity', '--complexity', dest = 'complexity',default=defaults['complexity'], help = "Complexity treshold for fastp")
 parser.add_argument('-bdb', '--bowtie', dest = 'bowtie', help = "path to a bowtie2 db file to filter out host reads")
+parser.add_argument('-pre', '--predb', dest = 'bowtie', help = "path to another kraken2 db folder to filter out potential host reads")
 #parser.add_argument('-classified-out', '--classified-out', dest = 'classified', help = "Classified file name")
 
 
@@ -52,6 +53,7 @@ fqfile = os.path.join(args.outdir,prefix + "_unmapped.fq")
 krakenoutfile = os.path.join(args.outdir,prefix + "_output.kraken")
 reportf = os.path.join(args.outdir,prefix + "_krakenreport.txt")
 classout = os.path.join(args.outdir,prefix + "_classified_sequences.txt")
+preclassout = os.path.join(args.outdir,prefix + "_pre_classified_sequences.txt")
 
 # Make output directories and check that all files exist
 if not os.path.exists(args.outdir):
@@ -80,7 +82,6 @@ logging.info("Unmapped reads were extracted and saved to {}".format(bamfile_out)
 
 cmd2 = "samtools fastq -@ " + args.threads + " -n " + bamfile_out + " | fastp --stdin --stdout --complexity_threshold " + args.complexity + " -Q -L -A -y " + " > " + fqfile #add fastp low complexity filtering
 
-
 proc2 = subprocess.Popen(cmd2, shell=True)
 proc2.wait()
 logging.info("FASTQ generated and saved to {}".format(fqfile))
@@ -100,7 +101,19 @@ proc4 = subprocess.Popen(cmd4, shell=True)
 proc4.wait()
 
 
-if args.bowtie is not None:
+if args.predb is not None:
+    c = args.kraken + " --threads " + args.threads + " --confidence 0.01 --classified-out " + preclassout + " --minimum-hit-groups 6 --db " + args.predb + " " + fqfile + " > /dev/null "
+    ppp=subprocess.Popen(c, shell=True)
+    ppp.wait()
+
+    c = "cat " + preclassout +  " | grep ^@ | tr -d ^@ | awk '{print $1}' > " + fqfile + ".exclude"
+    ppp=subprocess.Popen(c, shell=True)
+    ppp.wait()
+
+    ppp=subprocess.Popen("cat " + fqfile + ".id | grep -F -w -v -f " + fqfile + ".exclude | sponge " + fqfile + ".id" , shell=True)
+    ppp.wait()
+
+if args.bowtie is not None and args.predb is None:
     
     ppp=subprocess.Popen("bowtie2 --no-unal --very-fast -x " + args.bowtie +  " -p " + args.threads + " -b  " + bamfile_out + " | cut -f1 | grep -v ^@ > " + fqfile + ".exclude", shell=True)
     ppp.wait()
