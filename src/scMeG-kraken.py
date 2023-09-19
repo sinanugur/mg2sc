@@ -30,7 +30,7 @@ parser.add_argument('-confidence', '--confidence', dest = 'confidence',default=d
 parser.add_argument('-minimum-hit-groups', '--minimum-hit-groups', dest = 'hitgroups',default=defaults['minimum-hit-groups'], help = "Minimum hit groups")
 parser.add_argument('-complexity', '--complexity', dest = 'complexity',default=defaults['complexity'], help = "Complexity treshold for fastp")
 parser.add_argument('-bdb', '--bowtie', dest = 'bowtie', help = "path to a bowtie2 db file to filter out host reads")
-parser.add_argument('-pre', '--predb', dest = 'bowtie', help = "path to another kraken2 db folder to filter out potential host reads")
+parser.add_argument('-pre', '--predb', dest = 'predb', help = "path to another kraken2 db folder to filter out potential host reads")
 #parser.add_argument('-classified-out', '--classified-out', dest = 'classified', help = "Classified file name")
 
 
