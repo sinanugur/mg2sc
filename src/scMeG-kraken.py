@@ -102,7 +102,7 @@ proc4.wait()
 
 
 if args.predb is not None:
-    c = args.kraken + " --threads " + args.threads + " --confidence 0.3 --classified-out " + preclassout + " --minimum-hit-groups 6 --db " + args.predb + " " + fqfile + " > /dev/null "
+    c = args.kraken + " --threads " + args.threads + " --confidence 0.3 --classified-out " + preclassout + " --minimum-hit-groups 10 --db " + args.predb + " " + fqfile + " > /dev/null "
     ppp=subprocess.Popen(c, shell=True)
     ppp.wait()
 
